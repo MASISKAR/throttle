@@ -1,0 +1,25 @@
+
+class Throttle {
+  static _queue = new Map();
+  static start(callback, options) {
+    const timeout = _.get(options, 'timeout', 0);
+    let throttleId = _.get(options, 'throttleId');
+    if (!throttleId) {
+      throw new Error('throttleId is required');
+    }
+    throttleId = throttleId.toString();
+    if (Throttle._queue.has(throttleId)) {
+      const prevTimeoutId = Throttle._queue.get(throttleId);
+      clearTimeout(prevTimeoutId);
+    }
+    const timeoutId = setTimeout(() => {
+      callback();
+      Throttle._queue.delete(throttleId);
+    }, timeout);
+    Throttle._queue.set(throttleId, timeoutId);
+  }
+}
+
+module.exports = {
+  Throttle,
+};
